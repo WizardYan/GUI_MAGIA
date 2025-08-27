@@ -4,4 +4,4 @@ This repository contains the MAGIA GUI codes for PET modeling and analysis.
 
 ## GUI Screenshot
 
-![MAGIA GUI](main.png)
+![MAGIA GUI](main_figure.png)
