@@ -1,0 +1,21 @@
+tracer: [11c]raclopride
+scanner: 
+model: srtm
+dc: 1
+rc: 0
+cut_time: 60
+roi_set: 
+input_type: ref
+fwhm_pre: 5
+fwhm_post: 5
+fwhm_roi: 0
+cpi: 1
+norm_method: pet
+mc_fwhm: 7
+mc_excluded_frames: 1
+mc_ref_frame: 0
+mc_rtm: 1
+gu: 
+roi_type: atlas
+mni_roi_mask_dir: /vf/users/yanw4/GUI_MAGIA/ATLAS_CREATE/atlas_rois
+template: /vf/users/yanw4/GUI_MAGIA/magia-master/templates/[11c]raclopride.nii
