@@ -1,0 +1,55 @@
+function magia_visualize_fit_srtm(T,tacs,input,frames,roi_labels,results_dir)
+
+subject = strtok(extractAfter(results_dir,getenv('MAGIA_ARCHIVE')),'/');
+fit_dir = sprintf('%s/fits',results_dir);
+if(~exist(fit_dir,'dir'))
+    mkdir(fit_dir);
+end
+t = mean(frames,2);
+cri = cumtrapz(t,input);
+dt = [t(1); t(2:end)-t(1:end-1)];
+M = length(t);
+
+modelfits = zeros(size(tacs,1),length(t));
+for i = 1:size(tacs,1)
+    fig = figure('Visible','Off','Position',[100 100 700 400]);
+    plot(t,input,'k--'); hold on;
+    plot(t,tacs(i,:),'ko');
+    k = table2array(T(i,:));
+    y = simSRTM_1_0_0(k,t,input,cri,dt,M);
+    modelfits(i,:)=y';
+    plot(t,y,'k');
+    xlabel('Time (min)'); ylabel('Radioactivity concentration');
+    title([subject ' ' roi_labels{i}]);
+
+
+    % img_name = sprintf('%s/%s.png',fit_dir,roi_labels{i});
+    % a = annotation('textbox', [0.5 0.13 0.1 0.1], 'String',...
+    %     sprintf('R1 = %.2f; k2 = %.2f; BPnd = %.2f',...
+    %     k(1),k(2),k(3)));
+    % set(a,'Color','k','LineStyle','none','FontSize',12);
+    % print('-noui',img_name,'-dpng');
+
+
+    % Annotate model parameters; wzyan 
+    annotationText = sprintf('R1 = %.2f; k2 = %.2f; BPnd = %.2f', k(1), k(2), k(3));
+    a = annotation('textbox', [0.5 0.13 0.1 0.1], 'String', annotationText, ...
+        'Color', 'k', 'LineStyle', 'none', 'FontSize', 12);
+
+    % Export figure safely; wzyan to improve the robustness
+    img_name = sprintf('%s/%s.png', fit_dir, roi_labels{i});
+    try
+        print(fig, '-dpng', '-r150', img_name);
+    catch ME
+        warning('Could not export figure for ROI %s: %s', roi_labels{i}, ME.message);
+    end
+
+
+    close(fig);
+end
+
+fname = sprintf('%s/modelfits.mat',results_dir);
+s = struct('modelfits',modelfits,'tacs',tacs,'input',input,'frames',frames,'t',t,'roi_labels',{roi_labels}); 
+save(fname,'-struct','s');
+
+end
